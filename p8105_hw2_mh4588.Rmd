@@ -1,0 +1,36 @@
+---
+title: "p8105_hw2_mh4588"
+author: "Maggie Hsu"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("tidyverse") #Import packages that will be used here
+library("readxl")
+library("haven")
+```
+
+# Problem 1
+```{r NYC}
+nyc_subway <- read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") #Import the NYC transit dataset from the csv file as a data frame
+```
+
+# Problem 2
+```{r trash wheel}
+trash_wheel <- read_excel("./data/202309_Trash Wheel_Collection_Data.xlsx")
+
+```
+
+# Problem 3
+```{r GBBO}
+bake_off_bakers <- read_csv("./data/gbb_datasets/bakers.csv")
+
+bake_off_bakes <- read_csv("./data/gbb_datasets/bakes.csv")
+
+bake_off_results <- read_csv("./data/gbb_datasets/results.csv")
+
+bake_off_viewers <- read_csv("./data/gbb_datasets/viewers.csv")
+
+```
