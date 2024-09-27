@@ -19,7 +19,7 @@ nyc_subway <- read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") #
 
 # Problem 2
 ```{r trash wheel}
-trash_wheel <- read_excel("./data/202309_Trash Wheel_Collection_Data.xlsx")
+#trash_wheel <- read_excel("./data/202309_Trash Wheel_Collection_Data.xlsx")
 
 ```
 
