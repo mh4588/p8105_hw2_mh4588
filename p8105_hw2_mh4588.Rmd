@@ -14,23 +14,59 @@ library("haven")
 
 # Problem 1
 ```{r NYC}
-nyc_subway <- read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") #Import the NYC transit dataset from the csv file as a data frame
+#Import the NYC transit dataset from the csv file as a data frame. 
+nyc_subway = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") |> 
+  janitor::clean_names(nyc_subway, case = "old_janitor") #Clean variable names using the clean_names function
+
+nyc_subway = select(nyc_subway, line:entry, vending, ada) #Keep specified variables
+nyc_subway |>
+  mutate ( 
+    entry =  ifelse(pull(nyc_subway, var="entry")=="YES",TRUE,FALSE)
+     )
+#Convert the "entry" variable to a logical variable where YES is True and NO is False
+
+#Identify how many distinct stops are present 
+distinct(
+  select(
+    nyc_subway, c(line, station_name)
+    )
+  )
+
 ```
+
+The nyc_subway data describes subway stations in New York City through what lines the stations are part of, their names, longitude and latitude coordinates, whether there is an entry or not, entry types, whether there is vending, whether the station is ADA-compliant, and the route names and numbers. After importing the raw data, the variable names were cleaned using clean_names() from the janitor package to make them more consistent. The specified variables were kept using select, and the entry variable was converted into a logical variable using the mutate and ifelse functions. The nyc_subway dataset consists of `{r}nrow(nyc_subway)` rows and `{r}ncol(nyc_subway)`columns. Here, since each individual route is a separate column, the dataset is not tidy. 
+
+There are 465 distinct stops and `{r} sum((pull(nyc_subway, var="ada")=="TRUE"))` ADA-compliant stations in the subway system. Out of the stations without entrances, 
+
+
+## Reformatting the data to make it tidy
+```{r reformat}
+#Format route name and number into distinct variables using pivot_longer
+nyc_subway = pivot_longer(
+    nyc_subway, 
+    route1:route11,
+    names_to = "route_name", 
+    values_to = "route_number",
+    values_transform = list(route_number = as.character)) 
+
+```
+After reformatting the group of "route" columns, this dataset is now tidy. `{r}` stations serve the A train while `{r}` stations out of these are also ADA compliant. 
 
 # Problem 2
 ```{r trash wheel}
-#trash_wheel <- read_excel("./data/202309_Trash Wheel_Collection_Data.xlsx")
+trash_wheel <- read_excel("./data/202409 Trash Wheel Collection Data.xlsx") #Read dataset and omit non-data entries
 
 ```
 
 # Problem 3
 ```{r GBBO}
 bake_off_bakers <- read_csv("./data/gbb_datasets/bakers.csv")
-
 bake_off_bakes <- read_csv("./data/gbb_datasets/bakes.csv")
-
 bake_off_results <- read_csv("./data/gbb_datasets/results.csv")
-
 bake_off_viewers <- read_csv("./data/gbb_datasets/viewers.csv")
+
+
+
+kable()
 
 ```
