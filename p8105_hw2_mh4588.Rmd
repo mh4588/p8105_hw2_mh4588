@@ -118,8 +118,6 @@ bake_off_viewers <- pivot_longer(bake_off_viewers, "Series 1":"Series 10",names_
 colnames(bake_off_viewers) <- c("episode","series","viewers")
 bake_off_viewers = mutate(bake_off_viewers, episode = as.character(episode)) #convert to character so it can be merged with other data frames
 
-split_series <- str_split(pull(bake_off_viewers, var=series),' ', simplify = TRUE) #remove the series characters from the column
-bake_off_viewers = mutate(bake_off_viewers, series = split_series[,2]) #replace series with just the number so the dataframe is mergable
 
 #Merge datasets
 bakers_and_bakes <- left_join(bake_off_bakers, bake_off_bakes, by=c("baker", "series"))
@@ -133,7 +131,10 @@ bake_off <- bake_off[,c("series", "episode", "baker", "baker_name", "baker_age",
 
 #Export as csv
 write_csv(bake_off, "bake_off.csv")
+```
+The most important considerations I had to make when cleaning and wrangling these datasets were how to organize the variables and observations so they could be tidy and able to be merged together into the final dataset. I noticed some common variables, such as baker, season, and episode, so I had to make sure that each individual data frame could be merged based on these columns. Additionally, I had to manage inconsistencies within the data such as Jo being labeled "Jo" in the Bakers dataframe with the quotation marks, which would have to be replaced without the quotation marks so the baker names could be joined together in the full dataset. Most of the data management involved ensuring variable types and names were consistent and did not have empty rows.
 
+```{r star bakers}
 #Create a table with the star bakers
 star_bakers <- filter(bake_off, result=="STAR BAKER") #Filter to only show Star Bakers
 star_bakers = mutate(star_bakers,series = as.integer(series)) #Change character to integer type so it can be filtered. 
@@ -141,8 +142,9 @@ star_bakers <- filter(star_bakers, series >= 5 & series <= 10) #Filter to only s
 
 knitr::kable(star_bakers) #Create table
 ```
+Out of the Star Baker table, Richard Burr appears on multiple entries and appears to consistently be placed as Star Baker, winning 5 times. Although most of the bakers are from 20-40 years old, there were three Star Bakers over 60 years old: Nancy, Jane, and Marie while one of the Star Bakers (Liam) was 19 years old, which was surprising.
 
 ```{r viewership}
 head(bake_off_viewers, 10)
 ```
-The average viewership in Season 1 was `r mean(pull(filter(bake_off_viewers, series=="1")), na.rm=TRUE)` while the average viewership in Season 5 was `r mean(pull(filter(bake_off_viewers, series=="5")), na.rm=TRUE)`. 
+The average viewership in Season 1 was `r mean(pull(filter(bake_off_viewers, series=="Series 1")), na.rm=TRUE)` while the average viewership in Season 5 was `r mean(pull(filter(bake_off_viewers, series=="Series 5")), na.rm=TRUE)`. 
