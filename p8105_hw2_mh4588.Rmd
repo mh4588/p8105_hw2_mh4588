@@ -80,6 +80,8 @@ trash_wheels <-  bind_rows(mr_trash_wheel, prof_trash_wheel, gwynnda)#Merge all 
 ```
 
 # Analysis
+The trash wheel dataset consists of `{r}nrow(trash_wheels)` observations and  `{r}ncol(trash_wheels)` variables , with key variables being which wheel has which dumpsters, the date an observation was made, the weight and volume of a collection, and what types of trash were being collected, such as cigarette butts, plastic bottles, or plastic bags.
+
 The total weight of trash collected by Professor Trash Wheel is `r sum(pull(filter(trash_wheels, wheel=="Professor Trash Wheel"), var=weight_tons), na.rm=TRUE)` tons of trash while the total number of cigarette butts collected by Gwynnda in June of 2022 was `r sum(pull(filter(trash_wheels, wheel=="Gwynnda", month=="June", year==2022), var=cigarette_butts), na.rm=TRUE) ` butts. 
 
 # Problem 3
@@ -90,8 +92,41 @@ bake_off_bakes <- read_csv("./data/gbb_datasets/bakes.csv")
 bake_off_results <- read_csv("./data/gbb_datasets/results.csv")
 bake_off_viewers <- read_csv("./data/gbb_datasets/viewers.csv")
 
-bake_off <- data.frame() 
-clean, tidy, and otherwise wrangle each of these datasets; check for completeness and correctness across datasets (e.g. by viewing individual datasets and using anti_join); merge to create a single, final dataset; and organize this so that variables and observations are in meaningful orders. 
+#Clean and organize each dataset 
+#Bakers
+bake_off_bakers = janitor::clean_names(bake_off_bakers, case = "old_janitor") #clean variable names
+bake_off_bakers = mutate(bake_off_bakers, baker = strsplit(bake_off_bakers$baker_name, " .*")) #add column with just first names so it can be joined with the other tables based on name
+
+bake_off_bakers = mutate(bake_off_bakers, baker = as.character(baker))
+
+#Bakes
+bake_off_bakes = janitor::clean_names(bake_off_bakes, case = "old_janitor") #clean variable names
+bake_off_bakes = mutate(bake_off_bakes, baker=replace(pull(bake_off_bakes, var="baker"),pull(bake_off_bakes, var="baker")=='"Jo"',"Jo")) #remove quotation marks off "Jo" in the table
+       
+#Results
+bake_off_results |>
+  janitor::row_to_names(row_number = 67) |>
+  na.omit(bake_off_results)
+names(bake_off_results) <- bake_off_results[2,]
+bake_off_results <- bake_off_results[-c(1:2),]
+bake_off_results |>
+  mutate(series = as.double(series))
+
+#Viewers
+#Reorganize the viewer table
+bake_off_viewers <- pivot_longer(bake_off_viewers, "Series 1":"Series 10",names_to="series", values_to="viewers")
+colnames(bake_off_viewers) <- c("episode","series","viewers")
+bake_off_viewers = mutate(bake_off_viewers, episode = as.character(episode))
+
+#Merge datasets
+bakers_and_bakes <- left_join(bake_off_bakers, bake_off_bakes, by=c("baker", "series"))
+bakers_and_bakes = mutate(bakers_and_bakes, episode = as.character(episode), series = as.character(series)) #edit variable type to match variable types for the other table so it can be merged
+
+results_viewers <- left_join(bake_off_results, bake_off_viewers, by = c("episode","series"))
+#Final dataset
+bake_off <- left_join(bakers_and_bakes, results_viewers, by = c("episode","series", "baker"))
+
+#Organize final dataset and order variables
 
 kable()
 
