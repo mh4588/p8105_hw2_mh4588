@@ -57,7 +57,7 @@ After reformatting the group of "route" columns, this dataset is now tidy. `{r}`
 mr_trash_wheel <- read_excel("./data/202409 Trash Wheel Collection Data.xlsx", sheet = 1) #Read dataset and omit non-data entries
 
 #Clean variable names from this dataset and make cases consistent
-mr_trash_wheel= janitor::clean_names(trash_wheel, case = "old_janitor") |>
+mr_trash_wheel= janitor::clean_names(mr_trash_wheel, case = "old_janitor") |>
   select(1:14)  |> #remove blank columns
   filter(is.na(dumpster)==FALSE) |> #remove non-dumpster observations
   mutate(wheel = "Mr.Trash Wheel", sports_balls = as.integer(sports_balls)) #add wheel variable which identifies which trash wheel and round sports balls to the nearest integer
