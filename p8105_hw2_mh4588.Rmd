@@ -116,18 +116,33 @@ bake_off_results |>
 #Reorganize the viewer table
 bake_off_viewers <- pivot_longer(bake_off_viewers, "Series 1":"Series 10",names_to="series", values_to="viewers")
 colnames(bake_off_viewers) <- c("episode","series","viewers")
-bake_off_viewers = mutate(bake_off_viewers, episode = as.character(episode))
+bake_off_viewers = mutate(bake_off_viewers, episode = as.character(episode)) #convert to character so it can be merged with other data frames
+
+split_series <- str_split(pull(bake_off_viewers, var=series),' ', simplify = TRUE) #remove the series characters from the column
+bake_off_viewers = mutate(bake_off_viewers, series = split_series[,2]) #replace series with just the number so the dataframe is mergable
 
 #Merge datasets
 bakers_and_bakes <- left_join(bake_off_bakers, bake_off_bakes, by=c("baker", "series"))
 bakers_and_bakes = mutate(bakers_and_bakes, episode = as.character(episode), series = as.character(series)) #edit variable type to match variable types for the other table so it can be merged
 
-results_viewers <- left_join(bake_off_results, bake_off_viewers, by = c("episode","series"))
 #Final dataset
-bake_off <- left_join(bakers_and_bakes, results_viewers, by = c("episode","series", "baker"))
+bake_off <- left_join(bakers_and_bakes, bake_off_results, by = c("episode","series", "baker"))
 
 #Organize final dataset and order variables
+bake_off <- bake_off[,c("series", "episode", "baker", "baker_name", "baker_age", "baker_occupation", "hometown", "signature_bake", "show_stopper", "result", "technical")]
 
-kable()
+#Export as csv
+write_csv(bake_off, "bake_off.csv")
 
+#Create a table with the star bakers
+star_bakers <- filter(bake_off, result=="STAR BAKER") #Filter to only show Star Bakers
+star_bakers = mutate(star_bakers,series = as.integer(series)) #Change character to integer type so it can be filtered. 
+star_bakers <- filter(star_bakers, series >= 5 & series <= 10) #Filter to only show seasons 5-10
+
+knitr::kable(star_bakers) #Create table
 ```
+
+```{r viewership}
+head(bake_off_viewers, 10)
+```
+The average viewership in Season 1 was `r mean(pull(filter(bake_off_viewers, series=="1")), na.rm=TRUE)` while the average viewership in Season 5 was `r mean(pull(filter(bake_off_viewers, series=="5")), na.rm=TRUE)`. 
