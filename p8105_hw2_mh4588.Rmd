@@ -36,7 +36,9 @@ distinct(
 
 The nyc_subway data describes subway stations in New York City through what lines the stations are part of, their names, longitude and latitude coordinates, whether there is an entry or not, entry types, whether there is vending, whether the station is ADA-compliant, and the route names and numbers. After importing the raw data, the variable names were cleaned using clean_names() from the janitor package to make them more consistent. The specified variables were kept using select, and the entry variable was converted into a logical variable using the mutate and ifelse functions. The nyc_subway dataset consists of `{r}nrow(nyc_subway)` rows and `{r}ncol(nyc_subway)`columns. Here, since each individual route is a separate column, the dataset is not tidy. 
 
-There are 465 distinct stops and `{r} sum((pull(nyc_subway, var="ada")=="TRUE"))` ADA-compliant stations in the subway system. Out of the stations without entrances, 
+There are 465 distinct stops and `{r} sum((pull(nyc_subway, var="ada")=="TRUE"))` ADA-compliant stations in the subway system. Out of the stations without vending, `{r} nrow(filter(nyc_subway, vending=="NO", entry=="YES"))` allow entrances. 
+
+`r nrow(filter(nyc_subway, route_number=="A"))` stations serve the A train and `r nrow(filter(nyc_subway, route_number=="A", ada == TRUE))` out of these stations are ADA compliant. 
 
 
 ## Reformatting the data to make it tidy
